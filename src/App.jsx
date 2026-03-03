@@ -147,17 +147,17 @@ function EnergyNode({ id, data }) {
 
 /* ---------------- INITIAL GRAPH ---------------- */
 const initialNodes = [
-  { id: 'fuel', type: 'energy', position: { x: 0, y: 100 }, data: { label: 'Fuel', isSource: true, baseValue: 500 } },
-  { id: 'gen', type: 'energy', position: { x: 250, y: 100 }, data: { label: 'Generator', efficiency: 0.85 } },
-  { id: 't1', type: 'energy', position: { x: 500, y: 0 }, data: { label: 'Transformer A', efficiency: 0.95 } },
-  { id: 't2', type: 'energy', position: { x: 500, y: 200 }, data: { label: 'Transformer B', efficiency: 0.9 } },
-  { id: 'out', type: 'energy', position: { x: 750, y: 100 }, data: { label: 'Consumer Output' } },
+  { id: 'source', type: 'energy', position: { x: 0, y: 100 }, data: { label: 'Hydrothermal Vents', isSource: true, baseValue: 500 } },
+  { id: 'ocean', type: 'energy', position: { x: 250, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
+  { id: 't1', type: 'energy', position: { x: 500, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
+  { id: 't2', type: 'energy', position: { x: 500, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
+  { id: 'out', type: 'energy', position: { x: 750, y: 100 }, data: { label: 'Lander/Orbiter' } },
 ];
 
 const initialEdges = [
-  { id: 'e1', source: 'fuel', target: 'gen' },
-  { id: 'e2', source: 'gen', target: 't1' },
-  { id: 'e3', source: 'gen', target: 't2' },
+  { id: 'e1', source: 'source', target: 'ocean' },
+  { id: 'e2', source: 'ocean', target: 't1' },
+  { id: 'e3', source: 'ocean', target: 't2' },
   { id: 'e4', source: 't1', target: 'out' },
   { id: 'e5', source: 't2', target: 'out' },
 ];
