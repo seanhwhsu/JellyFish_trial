@@ -11,7 +11,6 @@ import {
 import '@xyflow/react/dist/style.css';
 
 /* ---------------- PROPAGATION ENGINE ---------------- */
-
 function propagate(nodes, edges) {
   const nodeMap = {};
   nodes.forEach((n) => {
@@ -25,26 +24,20 @@ function propagate(nodes, edges) {
   });
 
   let changed = true;
-
   while (changed) {
     changed = false;
-
     nodes.forEach((node) => {
       const inc = incoming[node.id] || [];
-
       let inputSum = 0;
       inc.forEach((srcId) => {
         inputSum += nodeMap[srcId]?.computed || 0;
       });
-
       let newValue;
-
       if (node.data.isSource) {
         newValue = node.data.baseValue;
       } else {
         newValue = inputSum * (node.data.efficiency ?? 1);
       }
-
       if (nodeMap[node.id].computed !== newValue) {
         nodeMap[node.id].computed = newValue;
         changed = true;
@@ -62,10 +55,8 @@ function propagate(nodes, edges) {
 }
 
 /* ---------------- CUSTOM NODE ---------------- */
-
 function EnergyNode({ id, data }) {
   const stop = (e) => e.stopPropagation();
-
   return (
     <div
       style={{
@@ -85,7 +76,6 @@ function EnergyNode({ id, data }) {
       {data.isSource && (
         <>
           <div style={{ fontSize: 12, marginTop: 5 }}>Base Value</div>
-
           <input
             className="nodrag"
             type="range"
@@ -99,14 +89,13 @@ function EnergyNode({ id, data }) {
             onMouseDown={stop}
             style={{ width: '100%' }}
           />
-
           <input
             className="nodrag"
             type="number"
-            value={data.baseValue}
             min="0"
             max="1000"
             step="10"
+            value={data.baseValue}
             onChange={(e) =>
               data.onChange(id, { baseValue: Number(e.target.value) })
             }
@@ -121,7 +110,6 @@ function EnergyNode({ id, data }) {
           <div style={{ fontSize: 12, marginTop: 5 }}>
             Efficiency ({(data.efficiency * 100).toFixed(0)}%)
           </div>
-
           <input
             className="nodrag"
             type="range"
@@ -135,7 +123,6 @@ function EnergyNode({ id, data }) {
             onMouseDown={stop}
             style={{ width: '100%' }}
           />
-
           <input
             className="nodrag"
             type="number"
@@ -159,102 +146,61 @@ function EnergyNode({ id, data }) {
 }
 
 /* ---------------- INITIAL GRAPH ---------------- */
-
 const initialNodes = [
-  {
-    id: 'fuel',
-    type: 'energy',
-    position: { x: 0, y: 100 },
-    data: {
-      label: 'Fuel',
-      isSource: true,
-      baseValue: 500,
-    },
-  },
-  {
-    id: 'gen',
-    type: 'energy',
-    position: { x: 250, y: 100 },
-    data: {
-      label: 'Generator',
-      efficiency: 0.85,
-    },
-  },
-  {
-    id: 't1',
-    type: 'energy',
-    position: { x: 500, y: 0 },
-    data: {
-      label: 'Transformer A',
-      efficiency: 0.95,
-    },
-  },
-  {
-    id: 't2',
-    type: 'energy',
-    position: { x: 500, y: 200 },
-    data: {
-      label: 'Transformer B',
-      efficiency: 0.9,
-    },
-  },
+  { id: 'fuel', type: 'energy', position: { x: 0, y: 100 }, data: { label: 'Fuel', isSource: true, baseValue: 500 } },
+  { id: 'gen', type: 'energy', position: { x: 250, y: 100 }, data: { label: 'Generator', efficiency: 0.85 } },
+  { id: 't1', type: 'energy', position: { x: 500, y: 0 }, data: { label: 'Transformer A', efficiency: 0.95 } },
+  { id: 't2', type: 'energy', position: { x: 500, y: 200 }, data: { label: 'Transformer B', efficiency: 0.9 } },
+  { id: 'out', type: 'energy', position: { x: 750, y: 100 }, data: { label: 'Consumer Output' } },
 ];
 
 const initialEdges = [
   { id: 'e1', source: 'fuel', target: 'gen' },
   { id: 'e2', source: 'gen', target: 't1' },
   { id: 'e3', source: 'gen', target: 't2' },
+  { id: 'e4', source: 't1', target: 'out' },
+  { id: 'e5', source: 't2', target: 'out' },
 ];
 
 /* ---------------- MAIN APP ---------------- */
-
 export default function App() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
   const updateNodeData = (id, changes) => {
     setNodes((nds) =>
-      nds.map((n) =>
-        n.id === id
-          ? { ...n, data: { ...n.data, ...changes } }
-          : n
-      )
+      nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...changes } } : n))
     );
   };
 
   const onNodesChange = useCallback(
-    (changes) =>
-      setNodes((nds) => applyNodeChanges(changes, nds)),
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
   const onEdgesChange = useCallback(
-    (changes) =>
-      setEdges((eds) => applyEdgeChanges(changes, eds)),
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
-  const onConnect = useCallback(
-    (params) =>
-      setEdges((eds) => addEdge(params, eds)),
-    []
-  );
-
-  /* --------- PROPAGATE WHENEVER GRAPH CHANGES --------- */
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
 
   useEffect(() => {
     const computed = propagate(nodes, edges);
-
+  
     setNodes((nds) =>
-      computed.map((n) => ({
-        ...n,
-        data: {
-          ...n.data,
-          onChange: updateNodeData,
-        },
-      }))
+      nds.map((n) => {
+        const updated = computed.find((c) => c.id === n.id);
+        return {
+          ...n,
+          data: { ...n.data, output: updated?.data.output, onChange: updateNodeData },
+        };
+      })
     );
-  }, [edges, nodes.length]);
+  }, [
+    edges,
+    ...nodes.map((n) => (n.data.isSource ? n.data.baseValue : n.data.efficiency)),
+  ]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
