@@ -65,6 +65,8 @@ function EnergyNode({ id, data }) {
         border: '1px solid #333',
         borderRadius: 8,
         background: 'white',
+        color: 'black',           // ← add this line
+        fontFamily: 'sans-serif', // optional: ensures readability
       }}
     >
       <strong>{data.label}</strong>
