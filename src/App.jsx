@@ -4,6 +4,7 @@ import {
   Controls, 
   MiniMap,
   ReactFlow,
+  ReactFlowProvider,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
@@ -209,19 +210,21 @@ export default function App() {
   ]);
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={{ energy: EnergyNode }}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-      >
-        <Controls />
-        <Background />
-      </ReactFlow>
-    </div>
+    <ReactFlowProvider>
+      <div style={{ width: '100vw', height: '100vh' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={{ energy: EnergyNode }}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+        >
+          <Controls />
+          <Background />
+        </ReactFlow>
+      </div>
+    </ReactFlowProvider>
   );
 }
