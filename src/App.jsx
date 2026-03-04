@@ -71,7 +71,7 @@ function ControlPanel() {
   return (
     <div
       style={{
-        width: 220,
+        width: 120,
         padding: 20,
         background: '#f4f4f4',
         borderRight: '1px solid #ccc',
