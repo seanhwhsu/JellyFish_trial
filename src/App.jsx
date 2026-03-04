@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Background,
-  Controls, 
+  Controls,
   MiniMap,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
@@ -35,12 +36,14 @@ function propagate(nodes, edges) {
       inc.forEach((srcId) => {
         inputSum += nodeMap[srcId]?.computed || 0;
       });
+
       let newValue;
       if (node.data.isSource) {
         newValue = node.data.baseValue;
       } else {
         newValue = inputSum * (node.data.efficiency ?? 1);
       }
+
       if (nodeMap[node.id].computed !== newValue) {
         nodeMap[node.id].computed = newValue;
         changed = true;
@@ -57,9 +60,45 @@ function propagate(nodes, edges) {
   }));
 }
 
+/* ---------------- CONTROL PANEL ---------------- */
+function ControlPanel() {
+  const { zoomIn, zoomOut, fitView, setViewport, getZoom } = useReactFlow();
+
+  const handleReset = () => {
+    setViewport({ x: 0, y: 0, zoom: 1 });
+  };
+
+  return (
+    <div
+      style={{
+        width: 220,
+        padding: 20,
+        background: '#f4f4f4',
+        borderRight: '1px solid #ccc',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        fontFamily: 'sans-serif',
+      }}
+    >
+      <h3>Control Panel</h3>
+
+      <button onClick={() => zoomIn({ duration: 300 })}>Zoom In</button>
+      <button onClick={() => zoomOut({ duration: 300 })}>Zoom Out</button>
+      <button onClick={() => fitView({ duration: 500 })}>Fit View</button>
+      <button onClick={handleReset}>Reset View</button>
+
+      <div style={{ marginTop: 10 }}>
+        Current Zoom: {getZoom().toFixed(2)}
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- CUSTOM NODE ---------------- */
 function EnergyNode({ id, data }) {
   const stop = (e) => e.stopPropagation();
+
   return (
     <div
       style={{
@@ -68,8 +107,8 @@ function EnergyNode({ id, data }) {
         border: '1px solid #333',
         borderRadius: 8,
         background: 'white',
-        color: 'black',           // ← add this line
-        fontFamily: 'sans-serif', // optional: ensures readability
+        color: 'black',
+        fontFamily: 'sans-serif',
       }}
     >
       <strong>{data.label}</strong>
@@ -81,6 +120,7 @@ function EnergyNode({ id, data }) {
       {data.isSource && (
         <>
           <div style={{ fontSize: 12, marginTop: 5 }}>Base Value</div>
+
           <input
             className="nodrag"
             type="range"
@@ -94,6 +134,7 @@ function EnergyNode({ id, data }) {
             onMouseDown={stop}
             style={{ width: '100%' }}
           />
+
           <input
             className="nodrag"
             type="number"
@@ -113,28 +154,30 @@ function EnergyNode({ id, data }) {
       {!data.isSource && (
         <>
           <div style={{ fontSize: 12, marginTop: 5 }}>
-            Efficiency ({(data.efficiency * 100).toFixed(0)}%)
+            Efficiency ({((data.efficiency ?? 1) * 100).toFixed(0)}%)
           </div>
+
           <input
             className="nodrag"
             type="range"
             min="0"
             max="1"
             step="0.01"
-            value={data.efficiency}
+            value={data.efficiency ?? 1}
             onChange={(e) =>
               data.onChange(id, { efficiency: Number(e.target.value) })
             }
             onMouseDown={stop}
             style={{ width: '100%' }}
           />
+
           <input
             className="nodrag"
             type="number"
             min="0"
             max="1"
             step="0.01"
-            value={data.efficiency}
+            value={data.efficiency ?? 1}
             onChange={(e) =>
               data.onChange(id, { efficiency: Number(e.target.value) })
             }
@@ -156,8 +199,8 @@ const initialNodes = [
   { id: 'ocean', type: 'energy', position: { x: 300, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
   { id: 't1', type: 'energy', position: { x: 600, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
   { id: 't2', type: 'energy', position: { x: 600, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
-  { id: 'collect', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Collection' , efficiency: 0.5 } },
-  { id: 'out', type: 'energy', position: { x: 1200, y: 100 }, data: { label: 'Processing' }, efficiency: 0.5  },
+  { id: 'collect', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Collection', efficiency: 0.5 } },
+  { id: 'out', type: 'energy', position: { x: 1200, y: 100 }, data: { label: 'Processing', efficiency: 0.5 } },
 ];
 
 const initialEdges = [
@@ -171,12 +214,23 @@ const initialEdges = [
 
 /* ---------------- MAIN APP ---------------- */
 export default function App() {
+  return (
+    <ReactFlowProvider>
+      <FlowApp />
+    </ReactFlowProvider>
+  );
+}
+
+/* ---------------- FLOW WRAPPER ---------------- */
+function FlowApp() {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
   const updateNodeData = (id, changes) => {
     setNodes((nds) =>
-      nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...changes } } : n))
+      nds.map((n) =>
+        n.id === id ? { ...n, data: { ...n.data, ...changes } } : n
+      )
     );
   };
 
@@ -190,28 +244,39 @@ export default function App() {
     []
   );
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    []
+  );
 
   useEffect(() => {
     const computed = propagate(nodes, edges);
-  
+
     setNodes((nds) =>
       nds.map((n) => {
         const updated = computed.find((c) => c.id === n.id);
         return {
           ...n,
-          data: { ...n.data, output: updated?.data.output, onChange: updateNodeData },
+          data: {
+            ...n.data,
+            output: updated?.data.output,
+            onChange: updateNodeData,
+          },
         };
       })
     );
   }, [
     edges,
-    ...nodes.map((n) => (n.data.isSource ? n.data.baseValue : n.data.efficiency)),
+    ...nodes.map((n) =>
+      n.data.isSource ? n.data.baseValue : n.data.efficiency
+    ),
   ]);
 
   return (
-    <ReactFlowProvider>
-      <div style={{ width: '100vw', height: '100vh' }}>
+    <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
+      <ControlPanel />
+
+      <div style={{ flex: 1 }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -222,9 +287,10 @@ export default function App() {
           fitView
         >
           <Controls />
+          <MiniMap />
           <Background />
         </ReactFlow>
       </div>
-    </ReactFlowProvider>
+    </div>
   );
 }
