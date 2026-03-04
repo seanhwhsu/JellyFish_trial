@@ -89,7 +89,7 @@ function EnergyNode({ id, data }) {
               data.onChange(id, { baseValue: Number(e.target.value) })
             }
             onMouseDown={stop}
-            style={{ width: '100%' }}
+            style={{ width: '90%' }}
           />
           <input
             className="nodrag"
@@ -102,7 +102,7 @@ function EnergyNode({ id, data }) {
               data.onChange(id, { baseValue: Number(e.target.value) })
             }
             onMouseDown={stop}
-            style={{ width: '100%', marginTop: 5 }}
+            style={{ width: '90%', marginTop: 5 }}
           />
         </>
       )}
