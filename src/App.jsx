@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
   Background,
+  Controls, 
+  MiniMap,
   ReactFlow,
   applyNodeChanges,
   applyEdgeChanges,
@@ -217,6 +219,7 @@ export default function App() {
         onConnect={onConnect}
         fitView
       >
+        <Controls />
         <Background />
       </ReactFlow>
     </div>
