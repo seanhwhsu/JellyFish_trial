@@ -153,8 +153,8 @@ const initialNodes = [
   { id: 'ocean', type: 'energy', position: { x: 300, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
   { id: 't1', type: 'energy', position: { x: 600, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
   { id: 't2', type: 'energy', position: { x: 600, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
-  { id: 'collect', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Collection' } },
-  { id: 'out', type: 'energy', position: { x: 1200, y: 100 }, data: { label: 'Processing' } },
+  { id: 'collect', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Collection' , efficiency: 0.5 } },
+  { id: 'out', type: 'energy', position: { x: 1200, y: 100 }, data: { label: 'Processing' }, efficiency: 0.5  },
 ];
 
 const initialEdges = [
