@@ -61,7 +61,7 @@ function EnergyNode({ id, data }) {
     <div
       style={{
         padding: 10,
-        width: 150,
+        width: 220,
         border: '1px solid #333',
         borderRadius: 8,
         background: 'white',
@@ -150,10 +150,10 @@ function EnergyNode({ id, data }) {
 /* ---------------- INITIAL GRAPH ---------------- */
 const initialNodes = [
   { id: 'source', type: 'energy', position: { x: 0, y: 100 }, data: { label: 'Hydrothermal Vents', isSource: true, baseValue: 500 } },
-  { id: 'ocean', type: 'energy', position: { x: 250, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
-  { id: 't1', type: 'energy', position: { x: 500, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
-  { id: 't2', type: 'energy', position: { x: 500, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
-  { id: 'out', type: 'energy', position: { x: 750, y: 100 }, data: { label: 'Lander/Orbiter' } },
+  { id: 'ocean', type: 'energy', position: { x: 300, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
+  { id: 't1', type: 'energy', position: { x: 600, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
+  { id: 't2', type: 'energy', position: { x: 600, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
+  { id: 'out', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Lander/Orbiter' } },
 ];
 
 const initialEdges = [
