@@ -61,7 +61,7 @@ function EnergyNode({ id, data }) {
     <div
       style={{
         padding: 10,
-        width: 250,
+        width: 220,
         border: '1px solid #333',
         borderRadius: 8,
         background: 'white',
