@@ -153,15 +153,17 @@ const initialNodes = [
   { id: 'ocean', type: 'energy', position: { x: 300, y: 100 }, data: { label: 'Ocean', efficiency: 0.85 } },
   { id: 't1', type: 'energy', position: { x: 600, y: 0 }, data: { label: 'Plume', efficiency: 0.95 } },
   { id: 't2', type: 'energy', position: { x: 600, y: 200 }, data: { label: 'Dike', efficiency: 0.9 } },
-  { id: 'out', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Lander/Orbiter' } },
+  { id: 'collect', type: 'energy', position: { x: 900, y: 100 }, data: { label: 'Collection' } },
+  { id: 'out', type: 'energy', position: { x: 1200, y: 100 }, data: { label: 'Processing' } },
 ];
 
 const initialEdges = [
   { id: 'e1', source: 'source', target: 'ocean' },
   { id: 'e2', source: 'ocean', target: 't1' },
   { id: 'e3', source: 'ocean', target: 't2' },
-  { id: 'e4', source: 't1', target: 'out' },
-  { id: 'e5', source: 't2', target: 'out' },
+  { id: 'e4', source: 't1', target: 'collect' },
+  { id: 'e5', source: 't2', target: 'collect' },
+  { id: 'e6', source: 'collect', target: 'out' },
 ];
 
 /* ---------------- MAIN APP ---------------- */
